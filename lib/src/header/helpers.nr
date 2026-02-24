@@ -20,7 +20,7 @@ use super::constants::{
 ///   * Shanghai upgrade (EIP-4895): +1 field (withdrawals_root)
 ///   * Cancun upgrade (EIP-4844): +3 fields (blob_gas_used, excess_blob_gas, parent_beacon_block_root)
 ///   * Prague upgrade (EIP-7685): +1 field (requests_hash)
-/// - Chain-specific requirements (e.g., Sepolia testnet always has 20 fields)
+/// - Chain-specific requirements (e.g., Sepolia testnet uses 20 fields before Prague, 21 after)
 ///
 /// # Arguments
 ///
@@ -57,8 +57,13 @@ pub fn get_header_fields_count(chain_id: u64, block_number: u64) -> u64 {
             fields_count += 1;
         }
     } else if chain_id == ETHEREUM_SEPOLIA_CHAIN_ID {
-        // Sepolia testnet always has all fields enabled
-        fields_count = 21;
+        // Sepolia testnet has field count based on Prague upgrade (block 7,836,331)
+        // Base fields (15) + London (1) + Shanghai (1) + Cancun (3) = 20
+        // Add Prague field (1) after activation
+        fields_count = 20; // Pre-Prague
+        if block_number >= 7_836_331 {
+            fields_count += 1; // Add requests_hash
+        }
     } else {
         // Reject unsupported networks
         assert(false, "Unsupported chain ID");

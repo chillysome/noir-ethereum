@@ -11,9 +11,9 @@ import {
   type GetBlockParameters,
   type PublicClient,
   hexToBytes,
+  pad,
   toBytes,
   toRlp,
-  pad,
 } from 'viem';
 import { parseByteArray, parseBytes32 } from './helpers';
 
@@ -49,15 +49,21 @@ export const getBlockHeader = async <T extends PublicClient>(
     hexToBytes(
       block.nonce ? pad(block.nonce, { size: 8 }) : '0x0000000000000000'
     ),
-    block.baseFeePerGas !== null ? toRlpBytes(block.baseFeePerGas!) : undefined,
+    block.baseFeePerGas !== null
+      ? toRlpBytes(block.baseFeePerGas as bigint)
+      : undefined,
     block.withdrawalsRoot ? hexToBytes(block.withdrawalsRoot) : undefined,
-    block.blobGasUsed !== null ? toRlpBytes(block.blobGasUsed!) : undefined,
-    block.excessBlobGas !== null ? toRlpBytes(block.excessBlobGas!) : undefined,
+    block.blobGasUsed !== null
+      ? toRlpBytes(block.blobGasUsed as bigint)
+      : undefined,
+    block.excessBlobGas !== null
+      ? toRlpBytes(block.excessBlobGas as bigint)
+      : undefined,
     block.parentBeaconBlockRoot
       ? hexToBytes(block.parentBeaconBlockRoot)
       : undefined,
-    (block as any).requestsHash
-      ? hexToBytes((block as any).requestsHash)
+    (block as { requestsHash?: string }).requestsHash
+      ? hexToBytes((block as { requestsHash?: string }).requestsHash)
       : undefined,
   ].filter((x) => x !== undefined);
 

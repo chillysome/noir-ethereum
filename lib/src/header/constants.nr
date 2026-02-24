@@ -111,7 +111,5 @@ pub global SHANGHAI_BLOCK_NUMBER: u64 = 17_034_870;
 pub global CANCUN_BLOCK_NUMBER: u64 = 19_426_587;
 
 /// Block number where the Prague upgrade was activated (EIP-7685)
-/// Note: This is a placeholder value as the Prague upgrade block number is not yet finalized on mainnet.
-/// Using a high value or the current latest block for testing purposes if needed.
-/// For now, we will assume it is active if we see 21 fields.
-pub global PRAGUE_BLOCK_NUMBER: u64 = 24_000_000; // Approximate/Placeholder
+/// Activated on mainnet at block 22,431,084 (2025-05-07 10:05:11 UTC)
+pub global PRAGUE_BLOCK_NUMBER: u64 = 22_431_084;

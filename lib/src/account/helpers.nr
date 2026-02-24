@@ -4,7 +4,7 @@
 //! from RLP-encoded data. These functions are essential for validating account states
 //! and address hashes in the Ethereum protocol.
 
-use std::hash::keccak256;
+use dep::keccak256::keccak256;
 
 use crate::helpers::bytes::right_pad;
 
@@ -60,7 +60,7 @@ pub fn assert_account_equals(
     account_rlp_list.get(BALANCE_INDEX).assert_eq_u128(
         "Balance",
         account_rlp,
-        U128::from_integer(account.balance()),
+        account.balance() as u128,
     );
 
     account_rlp_list.get(STORAGE_HASH_INDEX).assert_eq_bytes32(

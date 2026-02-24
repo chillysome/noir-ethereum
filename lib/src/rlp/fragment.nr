@@ -4,7 +4,7 @@
 //! A fragment represents a portion of RLP-encoded data with metadata about its position,
 //! length, and type (string or list).
 
-use crate::helpers::bytes::{byte_value, u32_to_u8, u64_to_u8};
+use crate::helpers::bytes::{byte_value, u128_to_u8, u32_to_u8, u64_to_u8};
 use crate::types::{address::Address, bytes32::Bytes32, fragment::Fragment};
 use super::constants::{List, String};
 use super::header::RlpHeader;
@@ -352,9 +352,9 @@ impl RlpFragment {
         self,
         field_name: str<FieldNameLen>,
         rlp: Fragment<u8, MaxRlpLen>,
-        value: U128,
+        value: u128,
     ) {
-        self.assert_eq_bounded_vec(field_name, rlp, byte_value(value.to_be_bytes()));
+        self.assert_eq_bounded_vec(field_name, rlp, byte_value(u128_to_u8(value)));
     }
 
     /// Asserts that an RLP fragment matches an Ethereum address.

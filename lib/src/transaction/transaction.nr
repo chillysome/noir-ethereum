@@ -38,7 +38,7 @@ pub struct LegacyTransaction<let MaxDataLen: u32> {
     /// The recipient address, or None for contract creation
     to: Option<Address>,
     /// The amount of ETH to transfer in wei
-    value: U128,
+    value: u128,
     /// The transaction data/code
     data: BoundedVec<u8, MaxDataLen>,
     /// The recovery parameter of the signature
@@ -55,7 +55,7 @@ impl<let MaxDataLen: u32> LegacyTransaction<MaxDataLen> {
         gas_price: u64,
         gas_limit: u64,
         to: Option<Address>,
-        value: U128,
+        value: u128,
         data: BoundedVec<u8, MaxDataLen>,
         v: u8,
         r: Bytes32,
@@ -85,7 +85,7 @@ impl<let MaxDataLen: u32> LegacyTransaction<MaxDataLen> {
     }
 
     /// Returns the amount of ETH to transfer in wei
-    pub fn value(self) -> U128 {
+    pub fn value(self) -> u128 {
         self.value
     }
 
@@ -185,7 +185,7 @@ pub struct EIP2930Transaction<let MaxDataLen: u32, let MaxAccessListLen: u32, le
     /// The recipient address, or None for contract creation
     to: Option<Address>,
     /// The amount of ETH to transfer in wei
-    value: U128,
+    value: u128,
     /// The transaction data/code
     data: BoundedVec<u8, MaxDataLen>,
     /// The access list for gas optimization
@@ -205,7 +205,7 @@ impl<let MaxDataLen: u32, let MaxAccessListLen: u32, let MaxStorageKeysLen: u32>
         gas_price: u64,
         gas_limit: u64,
         to: Option<Address>,
-        value: U128,
+        value: u128,
         data: BoundedVec<u8, MaxDataLen>,
         access_lists: BoundedVec<AccessList<MaxStorageKeysLen>, MaxAccessListLen>,
         v: u8,
@@ -241,7 +241,7 @@ impl<let MaxDataLen: u32, let MaxAccessListLen: u32, let MaxStorageKeysLen: u32>
     }
 
     /// Returns the amount of ETH to transfer in wei
-    pub fn value(self) -> U128 {
+    pub fn value(self) -> u128 {
         self.value
     }
 
@@ -314,7 +314,7 @@ pub struct EIP1559Transaction<let MaxDataLen: u32, let MaxAccessListLen: u32, le
     /// The recipient address, or None for contract creation
     to: Option<Address>,
     /// The amount of ETH to transfer in wei
-    value: U128,
+    value: u128,
     /// The transaction data/code
     data: BoundedVec<u8, MaxDataLen>,
     /// The access list for gas optimization
@@ -335,7 +335,7 @@ impl<let MaxDataLen: u32, let MaxAccessListLen: u32, let MaxStorageKeysLen: u32>
         max_fee_per_gas: u64,
         gas_limit: u64,
         to: Option<Address>,
-        value: U128,
+        value: u128,
         data: BoundedVec<u8, MaxDataLen>,
         access_lists: BoundedVec<AccessList<MaxStorageKeysLen>, MaxAccessListLen>,
         v: u8,
@@ -389,7 +389,7 @@ impl<let MaxDataLen: u32, let MaxAccessListLen: u32, let MaxStorageKeysLen: u32>
     }
 
     /// Returns the amount of ETH to transfer in wei
-    pub fn value(self) -> U128 {
+    pub fn value(self) -> u128 {
         self.value
     }
 
@@ -462,7 +462,7 @@ pub struct EIP4844Transaction<let MaxDataLen: u32, let MaxAccessListLen: u32, le
     /// The recipient address, or None for contract creation
     to: Option<Address>,
     /// The amount of ETH to transfer in wei
-    value: U128,
+    value: u128,
     /// The transaction data/code
     data: BoundedVec<u8, MaxDataLen>,
     /// The access list for gas optimization
@@ -487,7 +487,7 @@ impl<let MaxDataLen: u32, let MaxAccessListLen: u32, let MaxStorageKeysLen: u32>
         max_fee_per_gas: u64,
         gas_limit: u64,
         to: Option<Address>,
-        value: U128,
+        value: u128,
         data: BoundedVec<u8, MaxDataLen>,
         access_lists: BoundedVec<AccessList<MaxStorageKeysLen>, MaxAccessListLen>,
         max_fee_per_blob_gas: u64,
@@ -545,7 +545,7 @@ impl<let MaxDataLen: u32, let MaxAccessListLen: u32, let MaxStorageKeysLen: u32>
     }
 
     /// Returns the amount of ETH to transfer in wei
-    pub fn value(self) -> U128 {
+    pub fn value(self) -> u128 {
         self.value
     }
 
@@ -653,7 +653,7 @@ pub struct EIP7702Transaction<let MaxDataLen: u32, let MaxAccessListLen: u32, le
     /// The recipient address, or None for contract creation
     to: Option<Address>,
     /// The amount of ETH to transfer in wei
-    value: U128,
+    value: u128,
     /// The transaction data/code
     data: BoundedVec<u8, MaxDataLen>,
     /// The access list for gas optimization
@@ -684,7 +684,7 @@ pub struct TransactionPartial<let MaxDataLen: u32> {
     /// The recipient address, or None for contract creation
     to: Option<Address>,
     /// The amount of ETH to transfer in wei
-    value: U128,
+    value: u128,
     /// The transaction data/code
     data: BoundedVec<u8, MaxDataLen>,
     /// The recovery parameter of the signature
@@ -700,7 +700,7 @@ impl<let MaxDataLen: u32> TransactionPartial<MaxDataLen> {
         nonce: u64,
         gas_limit: u64,
         to: Option<Address>,
-        value: U128,
+        value: u128,
         data: BoundedVec<u8, MaxDataLen>,
         v: u8,
         r: Bytes32,
@@ -725,7 +725,7 @@ impl<let MaxDataLen: u32> TransactionPartial<MaxDataLen> {
     }
 
     /// Returns the amount of ETH to transfer in wei
-    pub fn value(self) -> U128 {
+    pub fn value(self) -> u128 {
         self.value
     }
 

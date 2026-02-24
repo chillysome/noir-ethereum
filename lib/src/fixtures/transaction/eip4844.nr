@@ -23,7 +23,7 @@ pub global transaction: TransactionPartial<MAX_DATA_LENGTH> = TransactionPartial
     Option::some(
         [255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 132, 83],
     ),
-    U128::from_integer(0),
+    0 as u128,
     BoundedVec::new(),
     1,
     [

@@ -5,7 +5,7 @@
 //! - Hash extraction from different node types (branch/extension)
 //! - Node hash verification
 
-use std::hash::keccak256;
+use dep::keccak256::keccak256;
 
 use crate::helpers::bytes::{byte_to_nibbles, bytes_to_nibbles};
 use crate::rlp::{decode::{decode_list_of_small_strings, decode_to_rlp_header}, list::RlpList};

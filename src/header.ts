@@ -13,10 +13,16 @@ import {
   hexToBytes,
   toBytes,
   toRlp,
+  pad,
 } from 'viem';
 import { parseByteArray, parseBytes32 } from './helpers';
 
 export type GetBlockHeaderOpts = GetBlockParameters;
+
+const toRlpBytes = (val: bigint) => {
+  if (val === 0n) return new Uint8Array(0);
+  return toBytes(val);
+};
 
 export const getBlockHeader = async <T extends PublicClient>(
   publicClient: T,
@@ -32,21 +38,26 @@ export const getBlockHeader = async <T extends PublicClient>(
     hexToBytes(block.stateRoot),
     hexToBytes(block.transactionsRoot),
     hexToBytes(block.receiptsRoot),
-    hexToBytes(block.logsBloom ?? '0x0'),
-    block.difficulty === 0n ? new Uint8Array(0) : toBytes(block.difficulty),
-    toBytes(block.number ?? 0n),
-    toBytes(block.gasLimit),
-    toBytes(block.gasUsed),
-    toBytes(block.timestamp),
+    block.logsBloom ? hexToBytes(block.logsBloom) : new Uint8Array(256),
+    toRlpBytes(block.difficulty),
+    toRlpBytes(block.number ?? 0n),
+    toRlpBytes(block.gasLimit),
+    toRlpBytes(block.gasUsed),
+    toRlpBytes(block.timestamp),
     hexToBytes(block.extraData),
     hexToBytes(block.mixHash),
-    hexToBytes(block.nonce ?? '0x0'),
-    block.baseFeePerGas ? toBytes(block.baseFeePerGas) : undefined,
+    hexToBytes(
+      block.nonce ? pad(block.nonce, { size: 8 }) : '0x0000000000000000'
+    ),
+    block.baseFeePerGas !== null ? toRlpBytes(block.baseFeePerGas!) : undefined,
     block.withdrawalsRoot ? hexToBytes(block.withdrawalsRoot) : undefined,
-    block.blobGasUsed ? toBytes(block.blobGasUsed) : undefined,
-    block.excessBlobGas ? toBytes(block.excessBlobGas) : undefined,
+    block.blobGasUsed !== null ? toRlpBytes(block.blobGasUsed!) : undefined,
+    block.excessBlobGas !== null ? toRlpBytes(block.excessBlobGas!) : undefined,
     block.parentBeaconBlockRoot
       ? hexToBytes(block.parentBeaconBlockRoot)
+      : undefined,
+    (block as any).requestsHash
+      ? hexToBytes((block as any).requestsHash)
       : undefined,
   ].filter((x) => x !== undefined);
 
@@ -69,6 +80,6 @@ export const getBlockHeader = async <T extends PublicClient>(
   return {
     chain_id: chainId,
     block_header_partial: header,
-    block_header_rlp: new BoundedVec(709, new U8(0), parseByteArray(headerRlp)),
+    block_header_rlp: new BoundedVec(742, new U8(0), parseByteArray(headerRlp)),
   };
 };

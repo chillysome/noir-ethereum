@@ -5,8 +5,8 @@ BACKEND=${BACKEND:-bb}
 
 cd $(dirname "$0")/../
 
-artifacts_path="./export"
-artifacts=$(ls $artifacts_path)
+artifacts_path="./target"
+artifacts=$(ls $artifacts_path/*.json 2>/dev/null)
 
 echo "{\"programs\": [" > gates_report.json
 
@@ -15,9 +15,9 @@ NUM_ARTIFACTS=$(ls -1q "$artifacts_path" | wc -l)
 
 ITER="1"
 for artifact in $artifacts; do    
-    ARTIFACT_NAME=$(basename "$artifact")
+    ARTIFACT_NAME=$(basename "$artifact" | cut -d. -f1)
 
-    GATES_INFO=$($BACKEND gates -b "$artifacts_path/$artifact")
+    GATES_INFO=$($BACKEND gates -b "$artifact")
     MAIN_FUNCTION_INFO=$(echo $GATES_INFO | jq -r '.functions[0] | .name = "main"')
     echo "{\"package_name\": \"$ARTIFACT_NAME\", \"functions\": [$MAIN_FUNCTION_INFO]" >> gates_report.json
 

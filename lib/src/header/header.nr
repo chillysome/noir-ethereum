@@ -6,7 +6,7 @@
 //! - Partial block header structure for state verification
 //! - Header verification functionality
 
-use std::hash::keccak256;
+use dep::keccak256::keccak256;
 
 use crate::helpers::arrays::sub_array_equals;
 use crate::rlp::{decode::decode_list, list::RlpList};

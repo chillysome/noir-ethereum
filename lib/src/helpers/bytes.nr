@@ -208,6 +208,24 @@ pub fn u64_to_u8(num: u64) -> [u8; 8] {
     out
 }
 
+/// Converts a u128 to a 16-byte array in big-endian format.
+///
+/// # Arguments
+///
+/// * `num`: The u128 value to convert
+///
+/// # Returns
+///
+/// A 16-byte array containing the big-endian representation of the input number
+pub fn u128_to_u8(num: u128) -> [u8; 16] {
+    let mut out: [u8; 16] = [0; 16];
+    for i in 0..16 {
+        out[i] = (num >> (120 - (i * 8))) as u8;
+    }
+
+    out
+}
+
 mod byte_to_nibbles_tests {
     use super::byte_to_nibbles;
 

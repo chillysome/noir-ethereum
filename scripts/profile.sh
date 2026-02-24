@@ -12,6 +12,19 @@
 
  format_time() {
   local input="$1"
+
+  # Return N/A for empty input
+  if [ -z "$input" ]; then
+    echo "N/A"
+    return 1
+  fi
+
+  # Check for valid time format (MM:SS or HH:MM:SS)
+  if ! [[ "$input" =~ ^[0-9]+:[0-9]+(\.[0-9]+)?$ ]] && ! [[ "$input" =~ ^[0-9]+:[0-9]+:[0-9]+(\.[0-9]+)?$ ]]; then
+    echo "N/A"
+    return 1
+  fi
+
   local hours=0 minutes=0 seconds=0 milliseconds=0
 
   # Split input into components
@@ -31,9 +44,15 @@
 
   # Separate seconds and milliseconds
   if [[ "$seconds" == *.* ]]; then
-    milliseconds=$(printf "%.0f" "$(echo "0.${seconds#*.} * 1000" | bc)")
+    milliseconds=$(printf "%.0f" "$(echo "0.${seconds#*.} * 1000" | bc 2>/dev/null)")
     seconds="${seconds%%.*}"
   fi
+
+  # Convert to decimal (base 10) to avoid octal interpretation with leading zeros
+  hours=$((10#$hours))
+  minutes=$((10#$minutes))
+  seconds=$((10#$seconds))
+  milliseconds=$((10#$milliseconds))
 
   # Build output string
   output=""
@@ -49,11 +68,18 @@
  
  convert_memory() {
      local kilobytes=$1
-     local megabytes=$(echo "scale=2; $kilobytes / 1024" | bc)
+
+     # Return N/A for empty or invalid input
+     if [ -z "$kilobytes" ] || ! [[ "$kilobytes" =~ ^[0-9]+$ ]]; then
+         echo "N/A"
+         return 1
+     fi
+
+     local megabytes=$(echo "scale=2; $kilobytes / 1024" | bc 2>/dev/null)
      if (( $(echo "$megabytes < 1024" | bc -l) )); then
          echo "${megabytes}MB"
      else
-         local gigabytes=$(echo "scale=2; $megabytes / 1024" | bc)
+         local gigabytes=$(echo "scale=2; $megabytes / 1024" | bc 2>/dev/null)
          echo "${gigabytes}GB"
      fi
  }
@@ -63,20 +89,39 @@
      local tool=$2
      local action=$3
      local command=$4
- 
+
+     # Use /usr/bin/time for GNU time with format support
+     local time_cmd="/usr/bin/time"
+     if ! command -v "$time_cmd" &> /dev/null; then
+         echo "Error: GNU time not found. Please install: sudo apt-get install time"
+         return 1
+     fi
+
      temp_file=$(mktemp)
-     gtime -f "$TIME_FORMAT" bash -c "$command" > "$temp_file" 2>&1
+     $time_cmd -f "$TIME_FORMAT" bash -c "$command" > "$temp_file" 2>&1
      output=$(<"$temp_file")
-    
-     elapsed_time=$(format_time "$(echo "$output" | grep 'Elapsed Time' | awk '{print $3}')")
-     user_time=$(echo "$output" | grep 'User Time' | awk '{print $3 " " $4}')
-     system_time=$(echo "$output" | grep 'System Time' | awk '{print $3 " " $4}')
-     cpu_usage=$(echo "$output" | grep 'CPU Usage' | awk '{print $3}')
-     max_memory_kb=$(echo "$output" | grep 'Max Memory' | awk '{print $3}')
-     max_memory=$(convert_memory "$max_memory_kb")
- 
+
+     elapsed_time=$(format_time "$(echo "$output" | grep "Elapsed Time" | awk '{print $3}')")
+     user_time=$(echo "$output" | grep "User Time" | awk '{print $3 " " $4}')
+     system_time=$(echo "$output" | grep "System Time" | awk '{print $3 " " $4}')
+     cpu_usage=$(echo "$output" | grep "CPU Usage" | awk '{print $3}')
+     max_memory_kb=$(echo "$output" | grep "Max Memory" | awk '{print $3}')
+
+     # Handle empty values
+     [ -z "$elapsed_time" ] && elapsed_time="N/A"
+     [ -z "$user_time" ] && user_time="N/A"
+     [ -z "$system_time" ] && system_time="N/A"
+     [ -z "$cpu_usage" ] && cpu_usage="N/A"
+
+     # Handle empty or invalid memory values
+     if [ -z "$max_memory_kb" ] || ! [[ "$max_memory_kb" =~ ^[0-9]+$ ]]; then
+         max_memory="N/A"
+     else
+         max_memory=$(convert_memory "$max_memory_kb")
+     fi
+
      echo "$package|$tool|$action|$elapsed_time|$user_time|$system_time|$cpu_usage|$max_memory"
- 
+
      rm "$temp_file"
  }
  

@@ -1,8 +1,20 @@
-import { Field } from '@zkpersona/noir-helpers';
+import { AbstractInteger } from '@zkpersona/noir-helpers';
 
-export const toU128 = (value: bigint) => {
-  const mask64 = (1n << 64n) - 1n; // Mask to extract lower 64 bits
-  const lo = value & mask64; // Lower 64 bits
-  const hi = value >> 64n; // Higher 64 bits
-  return { lo: new Field(lo), hi: new Field(hi) };
+/**
+ * U128 type for Noir 1.0 circuits.
+ * Represents an unsigned 128-bit integer.
+ */
+export class U128 extends AbstractInteger {
+  static MAX_VALUE = 340282366920938463463374607431768211455n; // 2^128 - 1
+  static MIN_VALUE = 0n;
+}
+
+/**
+ * Converts a bigint to a u128 value for Noir 1.0 circuits.
+ *
+ * @param value - The bigint value to convert
+ * @returns A U128 instance
+ */
+export const toU128 = (value: bigint): U128 => {
+  return new U128(value);
 };

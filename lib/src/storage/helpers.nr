@@ -4,7 +4,7 @@
 //! in the Merkle Patricia Trie (MPT). These functions are essential for validating
 //! storage keys and values in the Ethereum protocol.
 
-use std::hash::keccak256;
+use dep::keccak256::keccak256;
 
 use crate::account::constants::MAX_PREFIXED_KEY_NIBBLE_LENGTH;
 use crate::helpers::bytes::right_pad;

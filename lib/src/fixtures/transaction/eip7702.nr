@@ -64,7 +64,7 @@ pub global transaction: TransactionPartial<MAX_DATA_LENGTH> = TransactionPartial
     Option::some([
         0, 0, 0, 0, 113, 114, 125, 226, 46, 94, 157, 139, 175, 14, 218, 198, 243, 125, 160, 50,
     ]),
-    U128::from_integer(0),
+    0 as u128,
     data,
     0,
     [

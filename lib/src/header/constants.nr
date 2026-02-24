@@ -29,13 +29,14 @@
 /// + (Blob Gas Used: 8 bytes + 1 prefix)
 /// + (Excess Blob Gas: 8 bytes + 1 prefix)
 /// + (Parent Beacon Block Root: 32 bytes + 1 prefix)
-/// =  706
+/// + (Requests Hash: 32 bytes + 1 prefix)
+/// =  739
 ///
-/// 706 + list_prefix(3) = 709
-pub global MAX_HEADER_SIZE: u32 = 709;
+/// 739 + list_prefix(3) = 742
+pub global MAX_HEADER_SIZE: u32 = 742;
 
 /// Maximum number of fields allowed in a block header
-pub global MAX_HEADER_FIELDS_COUNT: u32 = 20;
+pub global MAX_HEADER_FIELDS_COUNT: u32 = 21;
 
 /// Index of the parent block hash in the RLP-encoded header
 pub global PARENT_HASH_INDEX: u32 = 0;
@@ -97,6 +98,9 @@ pub global EXCESS_BLOB_GAS_INDEX: u32 = 18;
 /// Index of the parent beacon block root in the RLP-encoded header (Cancun upgrade)
 pub global PARENT_BEACON_BLOCK_ROOT_INDEX: u32 = 19;
 
+/// Index of the requests hash in the RLP-encoded header (Prague upgrade / EIP-7685)
+pub global REQUESTS_HASH_INDEX: u32 = 20;
+
 /// Block number where the London upgrade was activated (EIP-1559)
 pub global LONDON_BLOCK_NUMBER: u64 = 12_965_000;
 
@@ -105,3 +109,9 @@ pub global SHANGHAI_BLOCK_NUMBER: u64 = 17_034_870;
 
 /// Block number where the Cancun upgrade was activated (EIP-4844)
 pub global CANCUN_BLOCK_NUMBER: u64 = 19_426_587;
+
+/// Block number where the Prague upgrade was activated (EIP-7685)
+/// Note: This is a placeholder value as the Prague upgrade block number is not yet finalized on mainnet.
+/// Using a high value or the current latest block for testing purposes if needed.
+/// For now, we will assume it is active if we see 21 fields.
+pub global PRAGUE_BLOCK_NUMBER: u64 = 24_000_000; // Approximate/Placeholder

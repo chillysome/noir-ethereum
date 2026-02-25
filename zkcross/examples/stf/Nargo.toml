@@ -1,0 +1,9 @@
+[package]
+name = "stf"
+type = "bin"
+authors = [""]
+
+[dependencies]
+zkcross = { path = "../../lib" }
+ethereum = { path = "../../../lib" }
+

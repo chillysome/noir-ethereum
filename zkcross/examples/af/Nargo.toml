@@ -1,0 +1,9 @@
+[package]
+name = "af"
+type = "bin"
+authors = [""]
+
+[dependencies]
+zkcross = { path = "../../lib" }
+ethereum = { path = "../../../lib" }
+

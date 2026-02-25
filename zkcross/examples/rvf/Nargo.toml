@@ -1,0 +1,8 @@
+[package]
+name = "rvf"
+type = "bin"
+authors = [""]
+
+[dependencies]
+zkcross = { path = "../../lib" }
+

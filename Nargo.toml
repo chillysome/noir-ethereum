@@ -6,5 +6,11 @@ members = [
     "examples/verify_header",
     "examples/verify_transaction",
     "examples/verify_receipt",
+    "zkcross/lib",
+    "zkcross/examples/af",
+    "zkcross/examples/svf",
+    "zkcross/examples/rvf",
+    "zkcross/examples/stf",
+    "zkcross/examples/zkcross",
 ]
 default-member = "lib"

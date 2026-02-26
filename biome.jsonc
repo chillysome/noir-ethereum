@@ -33,6 +33,25 @@
           }
         }
       }
+    },
+    {
+      // Test files need snake_case to match Noir circuit inputs
+      "include": ["tests/**/*.ts", "zkcross/tests/**/*.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useNamingConvention": "off",
+            "noNonNullAssertion": "off"
+          },
+          "suspicious": {
+            "noImplicitAnyLet": "off"
+          },
+          "complexity": {
+            "noForEach": "off",
+            "useSimplifiedLogicExpression": "off"
+          }
+        }
+      }
     }
   ]
 }

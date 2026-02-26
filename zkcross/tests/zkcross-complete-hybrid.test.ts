@@ -1,17 +1,20 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import {
-  Prover,
-  toCircuitInputs,
-  U8,
-  U64,
   Field,
   FixedSizeArray,
+  Prover,
+  U8,
+  U64,
+  toCircuitInputs,
 } from '@zkpersona/noir-helpers';
 
 import circuit from '../../target/zkcross.json' assert { type: 'json' };
 
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
 import os from 'node:os';
+import path from 'node:path';
 import type { CompiledCircuit } from '@noir-lang/noir_js';
 import {
   http,
@@ -20,12 +23,9 @@ import {
   hexToBytes,
   parseEther,
 } from 'viem';
-import { mainnet } from 'viem/chains';
 import { keccak256, recoverPublicKey, serializeTransaction } from 'viem';
-import { parseAddress, getAccountProof } from '../../src';
-import { execSync } from 'node:child_process';
-import fs from 'node:fs';
-import path from 'node:path';
+import { mainnet } from 'viem/chains';
+import { getAccountProof, parseAddress } from '../../src';
 
 describe('Complete zkCross Circuit (Hybrid: @zkpersona/noir-helpers + bb CLI)', () => {
   let prover: Prover;
@@ -93,7 +93,7 @@ describe('Complete zkCross Circuit (Hybrid: @zkpersona/noir-helpers + bb CLI)', 
       blockNumber: (blockNew.number - 1n) as bigint,
     });
 
-    if (!blockNew || !blockOld) {
+    if (!(blockNew && blockOld)) {
       throw new Error('Failed to fetch blocks');
     }
 

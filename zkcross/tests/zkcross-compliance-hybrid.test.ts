@@ -1,25 +1,27 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import {
+  Field,
+  FixedSizeArray,
   Prover,
   U8,
   U64,
-  Field,
-  FixedSizeArray,
 } from '@zkpersona/noir-helpers';
 
 import circuit from '../../target/zkcross_compliance.json' assert {
   type: 'json',
 };
 
-import { http, type PublicClient, createPublicClient, hexToBytes } from 'viem';
-import { mainnet } from 'viem/chains';
-import { keccak256, recoverPublicKey, serializeTransaction } from 'viem';
-import { parseAddress, getTransactionProof } from '../../src';
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
+import type { CompiledCircuit } from '@noir-lang/noir_js';
 import { toCircuitInputs } from '@zkpersona/noir-helpers';
+import { http, type PublicClient, createPublicClient, hexToBytes } from 'viem';
+import { keccak256, recoverPublicKey, serializeTransaction } from 'viem';
+import { mainnet } from 'viem/chains';
+import { getTransactionProof, parseAddress } from '../../src';
 
 describe('zkCross Compliance Circuit Hybrid: @zkpersona/noir-helpers + bb CLI', () => {
   let prover: Prover;
@@ -36,9 +38,8 @@ describe('zkCross Compliance Circuit Hybrid: @zkpersona/noir-helpers + bb CLI', 
   const witnessPath = path.join(outputDir, 'witness.gz');
 
   beforeAll(() => {
-    const os = require('node:os');
     const threads = os.cpus().length;
-    prover = new Prover(circuit as any, {
+    prover = new Prover(circuit as unknown as CompiledCircuit, {
       type: 'honk',
       options: { threads },
     });
@@ -81,7 +82,7 @@ describe('zkCross Compliance Circuit Hybrid: @zkpersona/noir-helpers + bb CLI', 
     const tx = await publicClient.getTransaction({ hash: txHash });
     console.timeEnd('fetch-transaction');
 
-    if (!tx || !tx.r || !tx.s || !tx.v || !tx.to) {
+    if (!(tx?.r && tx.s && tx.v && tx.to)) {
       throw new Error('Invalid transaction');
     }
 
@@ -241,7 +242,7 @@ describe('zkCross Compliance Circuit Hybrid: @zkpersona/noir-helpers + bb CLI', 
       '0x63cb9d253446d34b2590c9cf06973f14063ede340b0ce19382bf9224f2adc2f5';
     const tx = await publicClient.getTransaction({ hash: txHash });
 
-    if (!tx || !tx.r || !tx.s || !tx.v || !tx.to) {
+    if (!(tx?.r && tx.s && tx.v && tx.to)) {
       throw new Error('Invalid transaction');
     }
 

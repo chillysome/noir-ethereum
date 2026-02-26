@@ -4,15 +4,15 @@ import { Prover, toCircuitInputs } from '@zkpersona/noir-helpers';
 
 import circuit from '../target/verify_storage.json' assert { type: 'json' };
 
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
 import os from 'node:os';
+import path from 'node:path';
 import type { CompiledCircuit } from '@noir-lang/noir_js';
 import { http, type PublicClient, createPublicClient } from 'viem';
 import { mainnet } from 'viem/chains';
 import { getStorageProof } from '../src';
 import { getENSNameStorageSlot } from './helpers';
-import { execSync } from 'node:child_process';
-import fs from 'node:fs';
-import path from 'node:path';
 
 describe('Storage Proof Verification (Hybrid: @zkpersona/noir-helpers + bb CLI)', () => {
   let prover: Prover;

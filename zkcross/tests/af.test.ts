@@ -82,7 +82,7 @@ describe('Auditing Function (AF) Verification', () => {
 
     // Get a real transaction sender address
     const tx = block.transactions[0];
-    if (!tx || !('from' in tx)) {
+    if (!(tx && 'from' in tx)) {
       throw new Error('No transaction found');
     }
 

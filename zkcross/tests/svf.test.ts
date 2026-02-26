@@ -1,12 +1,12 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import {
-  Prover,
-  toCircuitInputs,
-  U8,
-  U64,
   Field,
   FixedSizeArray,
+  Prover,
+  U8,
+  U64,
+  toCircuitInputs,
 } from '@zkpersona/noir-helpers';
 
 import circuit from '../../target/svf.json' assert { type: 'json' };
@@ -14,8 +14,8 @@ import circuit from '../../target/svf.json' assert { type: 'json' };
 import os from 'node:os';
 import type { CompiledCircuit } from '@noir-lang/noir_js';
 import { http, type PublicClient, createPublicClient, hexToBytes } from 'viem';
-import { mainnet } from 'viem/chains';
 import { keccak256, recoverPublicKey, serializeTransaction } from 'viem';
+import { mainnet } from 'viem/chains';
 
 describe('Signature Verification Function (SVF) Verification', () => {
   let prover: Prover;
@@ -90,7 +90,8 @@ describe('Signature Verification Function (SVF) Verification', () => {
     console.log('Public key:', publicKeyHex);
 
     // Parse public key (65 bytes: 0x04 + x[32] + y[32] OR 33 bytes compressed)
-    let publicKeyX, publicKeyY;
+    let publicKeyX;
+    let publicKeyY;
     if (publicKey.length === 65) {
       // Uncompressed format
       publicKeyX = publicKey.slice(1, 33);
@@ -195,7 +196,8 @@ describe('Signature Verification Function (SVF) Verification', () => {
     console.log('Public key length:', publicKey.length);
 
     // Parse public key (65 bytes: 0x04 + x[32] + y[32] OR 33 bytes compressed)
-    let publicKeyX, publicKeyY;
+    let publicKeyX;
+    let publicKeyY;
     if (publicKey.length === 65) {
       // Uncompressed format
       publicKeyX = publicKey.slice(1, 33);
@@ -295,7 +297,8 @@ describe('Signature Verification Function (SVF) Verification', () => {
     console.log('Public key length:', publicKey.length);
 
     // Parse public key (65 bytes: 0x04 + x[32] + y[32] OR 33 bytes compressed)
-    let publicKeyX, publicKeyY;
+    let publicKeyX;
+    let publicKeyY;
     if (publicKey.length === 65) {
       // Uncompressed format
       publicKeyX = publicKey.slice(1, 33);

@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { Prover, toCircuitInputs, abiEncode } from '@zkpersona/noir-helpers';
+import { Prover, toCircuitInputs } from '@zkpersona/noir-helpers';
 
 import circuit from '../../target/rvf.json' assert { type: 'json' };
 

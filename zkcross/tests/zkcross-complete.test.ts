@@ -1,12 +1,12 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import {
-  Prover,
-  toCircuitInputs,
-  U8,
-  U64,
   Field,
   FixedSizeArray,
+  Prover,
+  U8,
+  U64,
+  toCircuitInputs,
 } from '@zkpersona/noir-helpers';
 
 import circuit from '../../target/zkcross.json' assert { type: 'json' };
@@ -20,9 +20,9 @@ import {
   hexToBytes,
   parseEther,
 } from 'viem';
-import { mainnet } from 'viem/chains';
 import { keccak256, recoverPublicKey, serializeTransaction } from 'viem';
-import { parseAddress, getAccountProof } from '../../src';
+import { mainnet } from 'viem/chains';
+import { getAccountProof, parseAddress } from '../../src';
 
 describe('Complete zkCross Circuit (AF + SVF + STF + RVF)', () => {
   let prover: Prover;
@@ -61,7 +61,7 @@ describe('Complete zkCross Circuit (AF + SVF + STF + RVF)', () => {
       blockNumber: (blockNew.number - 1n) as bigint,
     });
 
-    if (!blockNew || !blockOld) {
+    if (!(blockNew && blockOld)) {
       throw new Error('Failed to fetch blocks');
     }
 

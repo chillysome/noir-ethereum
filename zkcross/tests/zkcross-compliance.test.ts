@@ -1,12 +1,12 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import {
-  Prover,
-  toCircuitInputs,
-  U8,
-  U64,
   Field,
   FixedSizeArray,
+  Prover,
+  U8,
+  U64,
+  toCircuitInputs,
 } from '@zkpersona/noir-helpers';
 
 import circuit from '../../target/zkcross_compliance.json' assert {
@@ -16,9 +16,9 @@ import circuit from '../../target/zkcross_compliance.json' assert {
 import os from 'node:os';
 import type { CompiledCircuit } from '@noir-lang/noir_js';
 import { http, type PublicClient, createPublicClient, hexToBytes } from 'viem';
-import { mainnet } from 'viem/chains';
 import { keccak256, recoverPublicKey, serializeTransaction } from 'viem';
-import { parseAddress, getTransactionProof } from '../../src';
+import { mainnet } from 'viem/chains';
+import { getTransactionProof, parseAddress } from '../../src';
 
 describe('zkCross Compliance Circuit (AF + SVF + Transaction RVF)', () => {
   let prover: Prover;
@@ -49,7 +49,7 @@ describe('zkCross Compliance Circuit (AF + SVF + Transaction RVF)', () => {
     const tx = await publicClient.getTransaction({ hash: txHash });
     console.timeEnd('fetch-transaction');
 
-    if (!tx || !tx.r || !tx.s || !tx.v || !tx.to) {
+    if (!(tx?.r && tx.s && tx.v && tx.to)) {
       throw new Error('Invalid transaction');
     }
 
@@ -176,7 +176,7 @@ describe('zkCross Compliance Circuit (AF + SVF + Transaction RVF)', () => {
       '0x63cb9d253446d34b2590c9cf06973f14063ede340b0ce19382bf9224f2adc2f5';
     const tx = await publicClient.getTransaction({ hash: txHash });
 
-    if (!tx || !tx.r || !tx.s || !tx.v || !tx.to) {
+    if (!(tx?.r && tx.s && tx.v && tx.to)) {
       throw new Error('Invalid transaction');
     }
 

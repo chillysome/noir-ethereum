@@ -48,6 +48,8 @@
     "@ethereumjs/rlp": "^5.0.2",
     "@ethereumjs/tx": "^5.4.0",
     "@noir-lang/noir_codegen": "^1.0.0-beta.3",
+    "@noir-lang/noir_js": "1.0.0-beta.6",
+    "@noir-lang/noirc_abi": "1.0.0-beta.6",
     "@types/node": "^22",
     "dotenv": "^16.4.7",
     "klarity": "^0.0.3",
@@ -61,7 +63,6 @@
   },
   "dependencies": {
     "@ethereumjs/trie": "^6.2.1",
-    "@noir-lang/noir_js": "^1.0.0-beta.3",
     "@zkpersona/noir-helpers": "^0.2.1"
   }
 }

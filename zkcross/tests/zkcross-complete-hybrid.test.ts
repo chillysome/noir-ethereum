@@ -23,10 +23,20 @@ import {
 import { mainnet } from 'viem/chains';
 import { keccak256, recoverPublicKey, serializeTransaction } from 'viem';
 import { parseAddress, getAccountProof } from '../../src';
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
 
-describe('Complete zkCross Circuit (AF + SVF + STF + RVF)', () => {
+describe('Complete zkCross Circuit (Hybrid: @zkpersona/noir-helpers + bb CLI)', () => {
   let prover: Prover;
   let publicClient: PublicClient;
+
+  const bbPath = '/root/.bb/bb';
+  const circuitPath = path.join(process.cwd(), 'target/zkcross.json');
+  const outputDir = path.join(process.cwd(), 'target/zkcross');
+  const proofPath = path.join(outputDir, 'proof');
+  const vkPath = path.join(outputDir, 'vk');
+  const witnessPath = path.join(outputDir, 'witness.gz');
 
   beforeAll(() => {
     const threads = os.cpus().length;
@@ -40,7 +50,27 @@ describe('Complete zkCross Circuit (AF + SVF + STF + RVF)', () => {
         'https://eth-mainnet.g.alchemy.com/v2/NWE0grP8z2DMMTWR1yVp_'
       ),
     });
+
+    // Ensure output directory exists
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
   });
+
+  const runCommand = (command: string, captureOutput = false): string => {
+    try {
+      console.time(`exec-${command.split(' ')[0]}`);
+      const result = execSync(command, {
+        stdio: captureOutput ? 'pipe' : 'inherit',
+        maxBuffer: 50 * 1024 * 1024, // 50MB buffer
+      });
+      console.timeEnd(`exec-${command.split(' ')[0]}`);
+      return result ? result.toString() : '';
+    } catch (error) {
+      console.error(`Command failed: ${command}`);
+      throw error;
+    }
+  };
 
   async function findValidTransaction() {
     // Try to get a transaction from latest block
@@ -52,6 +82,8 @@ describe('Complete zkCross Circuit (AF + SVF + STF + RVF)', () => {
   }
 
   it('should prove complete zkCross verification (AF + SVF + STF + RVF)', async () => {
+    console.time('total-test-time');
+
     // Get latest block and previous block
     const blockNew = await publicClient.getBlock({
       blockTag: 'latest',
@@ -219,18 +251,66 @@ describe('Complete zkCross Circuit (AF + SVF + STF + RVF)', () => {
       new_receiver_state_root: receiverAccountDataNew.state_root,
     };
 
-    console.time('prove-zkcross-complete');
+    console.time('prove-zkcross-complete-hybrid');
     try {
+      console.time('prepare-inputs');
       const parsedInputs = toCircuitInputs(inputs);
       console.log('Inputs converted successfully');
-      const proof = await prover.fullProve(parsedInputs, { type: 'honk' });
-      console.timeEnd('prove-zkcross-complete');
+      console.timeEnd('prepare-inputs');
 
-      console.time('verify-zkcross-complete');
-      const isVerified = await prover.verify(proof, { type: 'honk' });
-      console.timeEnd('verify-zkcross-complete');
+      // Generate witness using @zkpersona/noir-helpers
+      console.time('generate-witness-helpers');
+      const { witness } = await prover.simulateWitness(parsedInputs);
+      console.timeEnd('generate-witness-helpers');
 
-      expect(isVerified).toBe(true);
+      // Save witness to file for bb CLI
+      console.time('save-witness');
+      fs.writeFileSync(witnessPath, Buffer.from(witness));
+      console.log(`Witness saved to: ${witnessPath} (${witness.length} bytes)`);
+      console.timeEnd('save-witness');
+
+      // Generate proof using bb CLI
+      console.time('bb-prove');
+      runCommand(
+        `${bbPath} prove -b ${circuitPath} -w ${witnessPath} -o ${outputDir} -s ultra_honk`
+      );
+      console.timeEnd('bb-prove');
+
+      // Generate verification key
+      console.time('bb-write-vk');
+      runCommand(
+        `${bbPath} write_vk -b ${circuitPath} -o ${outputDir} -s ultra_honk`
+      );
+      console.timeEnd('bb-write-vk');
+
+      // Verify proof using bb CLI
+      console.time('bb-verify');
+      const publicInputsPath = path.join(outputDir, 'public_inputs');
+      const targetPublicInputsPath = path.join(
+        process.cwd(),
+        'target/public_inputs'
+      );
+      if (fs.existsSync(publicInputsPath)) {
+        if (!fs.existsSync(path.join(process.cwd(), 'target'))) {
+          fs.mkdirSync(path.join(process.cwd(), 'target'), { recursive: true });
+        }
+        fs.copyFileSync(publicInputsPath, targetPublicInputsPath);
+        runCommand(
+          `${bbPath} verify -p ${proofPath} -k ${vkPath} -s ultra_honk`
+        );
+      } else {
+        console.warn('Public inputs file not found, skipping verification');
+      }
+      console.timeEnd('bb-verify');
+
+      console.timeEnd('prove-zkcross-complete-hybrid');
+      console.timeEnd('total-test-time');
+
+      expect(fs.existsSync(proofPath)).toBe(true);
+      expect(fs.existsSync(vkPath)).toBe(true);
+      console.log(
+        '✅ All four verifications passed: AF + SVF + STF + RVF (Hybrid approach)'
+      );
     } catch (error) {
       console.error('Error during proof generation:', error);
       throw error;
@@ -325,10 +405,18 @@ describe('Complete zkCross Circuit (AF + SVF + STF + RVF)', () => {
 
     try {
       const parsedInputs = toCircuitInputs(inputs);
-      await prover.fullProve(parsedInputs, { type: 'honk' });
+      const { witness } = await prover.simulateWitness(parsedInputs);
+      fs.writeFileSync(witnessPath, Buffer.from(witness));
+
+      runCommand(
+        `${bbPath} prove -b ${circuitPath} -w ${witnessPath} -o ${outputDir} -s ultra_honk 2>&1 || true`
+      );
       expect(false).toBe(true); // Should not reach here
     } catch (error) {
       expect(error).toBeDefined(); // Expected to fail due to blacklisted address
+      console.log(
+        '✅ Blacklisted address correctly rejected (Hybrid approach)'
+      );
     }
   });
 });

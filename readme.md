@@ -17,7 +17,13 @@ Add a brief description of the library
 
 ## Noir version compatibility
 
-This library is tested to work as of Noir version 0.36.0 & 1.0.0-beta.x.
+This library is tested to work as of Noir version:
+
+nargo version = 1.0.0-beta.6
+noirc version = 1.0.0-beta.6+e796dfd67726cbc28eb9991782533b211025928d
+
+barretenberg version 0.84.0
+
 
 ## Benchmarks
 
@@ -52,6 +58,33 @@ LIBRARY = { tag = "v0.1.0", git = "https://github.com/noir-lang/LIBRARY_NAME" }
 ### Usage
 
 `PLACEHOLDER`
+
+## Execution Environment
+
+This project is developed and tested on the following environment:
+
+- **OS**: Linux
+- **Shell**: zsh
+- **Noir version**: 0.36.0 & 1.0.0-beta.x compatible
+- **Node.js**: (Check with `node --version`)
+- **Package Manager**: pnpm
+
+### Quick Start
+
+```bash
+# Install dependencies
+pnpm install
+
+# Build the workspace
+nargo compile --workspace
+
+# Run tests
+pnpm test
+
+# Build zkcross compliance circuit
+cd zkcross/examples/zkcross_compliance
+nargo compile
+```
 
 ## Benchmarks
 

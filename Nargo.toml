@@ -12,5 +12,6 @@ members = [
     "zkcross/examples/rvf",
     "zkcross/examples/stf",
     "zkcross/examples/zkcross",
+    "zkcross/examples/zkcross_compliance",
 ]
 default-member = "lib"

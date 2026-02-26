@@ -1,0 +1,8 @@
+[package]
+name = "zkcross_compliance"
+type = "bin"
+authors = [""]
+
+[dependencies]
+zkcross = { path = "../../lib" }
+ethereum = { path = "../../../lib" }

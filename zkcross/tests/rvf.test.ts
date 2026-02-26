@@ -53,34 +53,25 @@ describe('Root Verification Function (RVF) Verification', () => {
     console.log('Expected value length: 110');
 
     const inputs = {
-      account_old: accountData.account,
-      proof_old: accountData.account_proof,
-      state_root_old: accountData.state_root,
-      account_new: accountData.account,
-      proof_new: accountData.account_proof,
-      state_root_new: accountData.state_root,
+      account: accountData.account,
+      proof: accountData.account_proof,
+      state_root: accountData.state_root,
     };
 
-    console.log('\nTesting RVF with same account twice...');
+    console.log('\nTesting RVF with single account...');
     try {
       const parsedInputs = toCircuitInputs(inputs);
       console.log('Inputs converted successfully');
-      console.log('proof_old.key length:', parsedInputs.proof_old?.key?.length);
-      console.log('proof_new.key length:', parsedInputs.proof_new?.key?.length);
+      console.log('proof.key length:', parsedInputs.proof?.key?.length);
 
-      if (parsedInputs.proof_old?.key?.length !== 66) {
+      if (parsedInputs.proof?.key?.length !== 66) {
         throw new Error(
-          `proof_old.key has invalid length: ${parsedInputs.proof_old.key?.length}, expected 66`
-        );
-      }
-      if (parsedInputs.proof_new?.key?.length !== 66) {
-        throw new Error(
-          `proof_new.key has invalid length: ${parsedInputs.proof_new.key?.length}, expected 66`
+          `proof.key has invalid length: ${parsedInputs.proof.key?.length}, expected 66`
         );
       }
 
       // Log first node structure
-      const firstNode = parsedInputs.proof_old?.proof?.nodes?.[0];
+      const firstNode = parsedInputs.proof?.proof?.nodes?.[0];
       if (firstNode) {
         console.log(
           'First non-empty byte in first node:',
@@ -101,16 +92,16 @@ describe('Root Verification Function (RVF) Verification', () => {
     }
   });
 
-  it.skip('should prove root cross block verification', async () => {
+  it('should prove root cross block verification (two blocks)', async () => {
     // Get latest block and previous block
     const blockNew = await publicClient.getBlock({ blockTag: 'latest' });
     if (!blockNew) {
       throw new Error('Failed to fetch block');
     }
 
-    // Use the latest block for both old and new (same block)
-    // This tests that the circuit works correctly when there's no state change
-    const blockOld = blockNew;
+    const blockOld = await publicClient.getBlock({
+      blockNumber: (blockNew.number - 1n) as bigint,
+    });
 
     console.log('Block old:', {
       number: blockOld.number,
@@ -144,52 +135,56 @@ describe('Root Verification Function (RVF) Verification', () => {
       nonce: accountDataNew.account.nonce,
     });
 
-    // Format inputs for RVF circuit
-    const inputs = {
-      account_old: accountDataOld.account,
-      proof_old: accountDataOld.account_proof,
-      state_root_old: accountDataOld.state_root,
-      account_new: accountDataNew.account,
-      proof_new: accountDataNew.account_proof,
-      state_root_new: accountDataNew.state_root,
+    // Verify account in old block
+    const inputsOld = {
+      account: accountDataOld.account,
+      proof: accountDataOld.account_proof,
+      state_root: accountDataOld.state_root,
     };
 
-    console.log('Inputs structure:');
-    console.log('- account_old address:', accountDataOld.account.address);
-    console.log('- account_old nonce:', accountDataOld.account.nonce);
-    console.log('- proof_old depth:', accountDataOld.account_proof.proof.depth);
-    console.log(
-      '- proof_old nodes count:',
-      accountDataOld.account_proof.proof.nodes.length
-    );
-    console.log(
-      '- proof_old leaf length:',
-      accountDataOld.account_proof.proof.leaf.length
-    );
-    console.log('- state_root_old:', accountDataOld.state_root);
-    console.log('- account_new address:', accountDataNew.account.address);
-    console.log('- account_new nonce:', accountDataNew.account.nonce);
-    console.log('- proof_new depth:', accountDataNew.account_proof.proof.depth);
-    console.log('- state_root_new:', accountDataNew.state_root);
-
-    console.time('prove-rvf');
+    console.log('\nVerifying account in old block...');
+    console.time('prove-rvf-old');
     try {
-      // Try using toCircuitInputs first
-      const parsedInputs = toCircuitInputs(inputs);
-      console.log('toCircuitInputs succeeded, trying to prove...');
-      const proof = await prover.fullProve(parsedInputs, { type: 'honk' });
-      console.timeEnd('prove-rvf');
+      const parsedInputsOld = toCircuitInputs(inputsOld);
+      const proofOld = await prover.fullProve(parsedInputsOld, {
+        type: 'honk',
+      });
+      console.timeEnd('prove-rvf-old');
+      console.time('verify-rvf-old');
+      const isVerifiedOld = await prover.verify(proofOld, { type: 'honk' });
+      console.timeEnd('verify-rvf-old');
+      expect(isVerifiedOld).toBe(true);
+      console.log('✓ Old block verification succeeded');
     } catch (error) {
-      console.log('Error during proving:', error);
-      console.log('Error message:', (error as Error).message);
-      console.log('Error stack:', (error as Error).stack);
+      console.error('Old block verification failed:', error);
       throw error;
     }
 
-    console.time('verify-rvf');
-    const isVerified = await prover.verify(proof, { type: 'honk' });
-    console.timeEnd('verify-rvf');
+    // Verify account in new block
+    const inputsNew = {
+      account: accountDataNew.account,
+      proof: accountDataNew.account_proof,
+      state_root: accountDataNew.state_root,
+    };
 
-    expect(isVerified).toBe(true);
+    console.log('\nVerifying account in new block...');
+    console.time('prove-rvf-new');
+    try {
+      const parsedInputsNew = toCircuitInputs(inputsNew);
+      const proofNew = await prover.fullProve(parsedInputsNew, {
+        type: 'honk',
+      });
+      console.timeEnd('prove-rvf-new');
+      console.time('verify-rvf-new');
+      const isVerifiedNew = await prover.verify(proofNew, { type: 'honk' });
+      console.timeEnd('verify-rvf-new');
+      expect(isVerifiedNew).toBe(true);
+      console.log('✓ New block verification succeeded');
+    } catch (error) {
+      console.error('New block verification failed:', error);
+      throw error;
+    }
+
+    console.log('\n✓ Both block verifications succeeded');
   });
 });

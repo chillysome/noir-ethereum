@@ -17,7 +17,7 @@ pub use af::{audit_address, audit_addresses, is_blacklisted};
 pub use svf::verify_signature;
 
 // Re-export RVF functions
-pub use rvf::verify_root_cross_block;
+pub use rvf::verify_single_account;
 
 // Re-export STF paper implementation
 pub use stf_paper::{
